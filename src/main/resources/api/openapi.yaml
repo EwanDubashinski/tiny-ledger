@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: Tiny Ledger API
+  description: API for a simple ledger supporting deposits, withdrawals, and balance inquiries.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /transactions:
+    post:
+      summary: Record a money transaction (deposit or withdrawal)
+      operationId: createTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        "201":
+          description: Transaction recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        "400":
+          description: Invalid transaction request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Business rule violation (e.g., insufficient funds, incorrect amount)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /balance:
+    get:
+      summary: Get the current balance
+      operationId: getBalance
+      responses:
+        "200":
+          description: Current balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+  /transactions/history:
+    get:
+      summary: Get transaction history
+      operationId: getTransactionHistory
+      responses:
+        "200":
+          description: Transaction history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+components:
+  schemas:
+    TransactionRequest:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          type: string
+          enum: [deposit, withdrawal]
+          description: Type of transaction.
+        amount:
+          type: string
+          pattern: "^-?\\d{1,18}(\\.\\d{1,2})?$"
+          description: "Monetary value with up to 2 decimal places, stored as a string to maintain precision."
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the transaction.
+        type:
+          type: string
+          enum: [deposit, withdrawal]
+        amount:
+          type: string
+          pattern: "^-?\\d{1,18}(\\.\\d{1,2})?$"
+          description: "Monetary value with up to 2 decimal places, stored as a string to maintain precision."
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the transaction.
+    BalanceResponse:
+      type: object
+      properties:
+        balance:
+          type: string
+          pattern: "^-?\\d{1,18}(\\.\\d{1,2})?$"
+          description: "Current account balance stored as a string to ensure precision."
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code (e.g., INSUFFICIENT_FUNDS, INVALID_AMOUNT).
+        message:
+          type: string
+          description: Human-readable error message.
