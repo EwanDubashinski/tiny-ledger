@@ -7,10 +7,10 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
-  /transactions:
+  /deposit:
     post:
-      summary: Record a money transaction (deposit or withdrawal)
-      operationId: createTransaction
+      summary: Record a deposit transaction
+      operationId: createDeposit
       requestBody:
         required: true
         content:
@@ -19,13 +19,42 @@ paths:
               $ref: '#/components/schemas/TransactionRequest'
       responses:
         "201":
-          description: Transaction recorded successfully
+          description: Deposit recorded successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
         "400":
-          description: Invalid transaction request
+          description: Invalid deposit request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Business rule violation (e.g., incorrect amount)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /withdrawal:
+    post:
+      summary: Record a withdrawal transaction
+      operationId: createWithdrawal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        "201":
+          description: Withdrawal recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        "400":
+          description: Invalid withdrawal request
           content:
             application/json:
               schema:
@@ -47,7 +76,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BalanceResponse'
-  /transactions/history:
+  /history:
     get:
       summary: Get transaction history
       operationId: getTransactionHistory
@@ -65,13 +94,8 @@ components:
     TransactionRequest:
       type: object
       required:
-        - type
         - amount
       properties:
-        type:
-          type: string
-          enum: [deposit, withdrawal]
-          description: Type of transaction.
         amount:
           type: string
           pattern: "^-?\\d{1,18}(\\.\\d{1,2})?$"
