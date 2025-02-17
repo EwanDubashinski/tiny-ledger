@@ -1,15 +1,14 @@
 package com.example.tiny_ledger.repository;
 
 import com.example.tiny_ledger.model.Transaction;
-import org.springframework.stereotype.Repository;
+import com.example.tiny_ledger.vo.Balance;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface ILedgerRepository {
-    void updateBalance(BigDecimal newBalance);
+    void setBalance(Balance newBalance);
 
-    BigDecimal getBalance();
+    Balance getBalance();
 
     void addTransaction(Transaction transaction);
 

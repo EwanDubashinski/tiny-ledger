@@ -11,24 +11,15 @@ import java.time.OffsetDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Transaction {
     public enum Type {
         DEPOSIT, WITHDRAWAL
     }
 
-    @Getter
-    @Setter
     private Type type;
-
-    @Getter
-    @Setter
     private Amount amount;
-
-    @Getter
-    @Setter
     private OffsetDateTime timestamp;
-
-    @Getter
-    @Setter
     private TransactionId id;
 }

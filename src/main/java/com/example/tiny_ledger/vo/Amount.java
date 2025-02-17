@@ -1,41 +1,35 @@
 package com.example.tiny_ledger.vo;
 
+import com.example.tiny_ledger.exception.InvalidAmountException;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+import static com.example.tiny_ledger.util.StringUtils.formatMoney;
 
+@EqualsAndHashCode
 public class Amount {
     @Getter
     private final BigDecimal amount;
 
     public Amount(String stringAmount)  {
         if (stringAmount == null) {
-            throw new IllegalArgumentException(); // TODO
+            throw new InvalidAmountException("The amount cannot be null");
         }
 
         try {
             amount = new BigDecimal(stringAmount);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(); // TODO
+            throw new InvalidAmountException("Invalid number");
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("The amount cannot be equal or below zero");
         }
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(amount);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Amount that = (Amount) obj;
-        return amount.equals(that.amount);
-    }
-
-    @Override
     public String toString() {
-        return amount.toString();
+        return formatMoney(amount);
     }
 }
